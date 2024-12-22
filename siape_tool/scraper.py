@@ -9,11 +9,10 @@ from tenacity import retry, wait_exponential, stop_after_attempt
 
 
 class ScraperSIAPE:
-    def __init__(self, resid=None, zon_cli_filter=None, nzeb=None):
+    def __init__(self, resid=None, nzeb=None):
         self.url = URL
         self.headers = HEADERS
-        self.resid = resid
-        self.zon_cli_filter = zon_cli_filter
+        self.resid = RESID_MAP_IN[resid] if resid is not None else None
         self.nzeb = nzeb
 
     def get_data(self, payload):
@@ -133,7 +132,7 @@ class ScraperSIAPE:
             )
         else:
             df = pd.DataFrame(response.json()["data"])
-            df.columns = ['APE', 'CLA_ENG', 'EP_GL_NREN', 'EP_GL_REN', 'CO2']
+            df.columns = ['# OBS', 'CLA_ENG', 'EP_GL_NREN', 'EP_GL_REN', 'CO2']
             return df
 
     def _merge_df_input_response(self, df_input, df_response):
@@ -160,7 +159,7 @@ class ScraperSIAPE:
         })
 
         if "RESID" in dfs.columns:
-            dfs["RESID"] = dfs["RESID"].map(RESID_MAP)
+            dfs["RESID"] = dfs["RESID"].map(RESID_MAP_OUT)
 
         if "REG" in dfs.columns:
             dfs["REG"] = dfs["REG"].map(CODREG_TO_REG)

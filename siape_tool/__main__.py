@@ -4,7 +4,6 @@ import sys
 
 from siape_tool.cli import SIAPEToolCLI
 
-
 def main():
     fire.Fire(SIAPEToolCLI)
 

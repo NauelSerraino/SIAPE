@@ -1,17 +1,29 @@
 from itertools import product
 
-from siape_tool.utils.constants import SURFACE_LIMITS, YEARS_LIMITS, ZONCLI, CODREG, COMBS_DP412_93_RESID, CODREG_TO_PROV
+from siape_tool.utils.constants import (
+    SURFACE_LIMITS, 
+    YEARS_LIMITS, 
+    ZONCLI, 
+    CODREG, 
+    COMBS_DP412_93_RESID, 
+    CODREG_TO_PROV
+)
 
 """
 Here we define all the possible combinations of the API calls that we need to make.
 """
 
+# COMBINATIONS OF API'S PARAMETERS
 COMBS_YEARS_SURFACE = list(product(YEARS_LIMITS, SURFACE_LIMITS))
 COMBS_YEARS_SURFACE_ZONCLI = list(product(YEARS_LIMITS, SURFACE_LIMITS, ZONCLI))
 COMBS_YEARS_ZONCLI = list(product(YEARS_LIMITS, ZONCLI))
 COMBS_SURFACE_ZONCLI = list(product(SURFACE_LIMITS, ZONCLI))
 COMBS_REG_ZONCLI = list(product(CODREG, ZONCLI))
-COMBS_REG_PROV = [[reg, prov] for reg in CODREG_TO_PROV.keys() for prov in CODREG_TO_PROV[reg]]
+COMBS_REG_PROV = [
+    [reg, prov] 
+    for reg in CODREG_TO_PROV.keys() 
+    for prov in CODREG_TO_PROV[reg]
+    ]
 COMSB_REG_PROV_ZONCLI = [
     [reg, prov, zoncli]
     for reg in CODREG_TO_PROV.keys()
@@ -19,6 +31,61 @@ COMSB_REG_PROV_ZONCLI = [
     for zoncli in ZONCLI
 ]
 
+# LIST OF PAYLOADS - Single combinations
+STANDARD_PAYLOAD = [
+    {
+        "group[]": "claen",
+        "nofilter": "false",
+    }
+]
+
+NATIONAL_ZONCLI_PAYLOAD = [
+    {
+        "group[]": "claen",
+        "where[zoncli]": ZONCLI[i],
+        "nofilter": "false",
+    }
+    for i in range(len(ZONCLI))
+]
+
+COMBS_REG_PAYLOAD = [
+    {
+        "group[]": "claen",
+        "where[cod_reg]": CODREG[i],
+        "nofilter": "false",
+    }
+    for i in range(len(CODREG))
+]
+
+COMBS_YEARS_PAYLOAD = [
+    {
+        "group[]": "claen",
+        "nofilter": "false",
+        "where[annoc][range][]": YEARS_LIMITS[i],
+    }
+    for i in range(len(YEARS_LIMITS))
+]
+
+COMBS_SURFACE_PAYLOAD = [
+    {
+        "group[]": "claen",
+        "nofilter": "false",
+        "where[suris][range][]": SURFACE_LIMITS[i],
+    }
+    for i in range(len(SURFACE_LIMITS))
+]
+
+COMBS_DP412_93 = [
+    {
+        "group[]": "claen",
+        "where[destuso]": value,
+        "where[dpr412]": key,
+        "nofilter": "false",
+    }
+    for key, value in COMBS_DP412_93_RESID.items()
+]
+
+# LIST OF PAYLOADS - Combined combinations (Admissible combinations)
 COMBS_YEARS_SURFACE_PAYLOAD = [
     {
         "group[]": "claen",
@@ -29,15 +96,35 @@ COMBS_YEARS_SURFACE_PAYLOAD = [
     for i in range(len(COMBS_YEARS_SURFACE))
 ]
 
-COMBS_YEARS_SURFACE_ZONCLI_PAYLOAD = [
+COMBS_REG_PROV_PAYLOAD = [
     {
         "group[]": "claen",
+        "where[cod_reg]": COMBS_REG_PROV[i][0],
+        "where[cod_pro]": COMBS_REG_PROV[i][1],
         "nofilter": "false",
-        "where[annoc][range][]": COMBS_YEARS_SURFACE_ZONCLI[i][0],
-        "where[suris][range][]": COMBS_YEARS_SURFACE_ZONCLI[i][1],
-        "where[zoncli]": COMBS_YEARS_SURFACE_ZONCLI[i][2],
     }
-    for i in range(len(COMBS_YEARS_SURFACE_ZONCLI))
+    for i in range(len(COMBS_REG_PROV))
+]
+
+COMBS_REG_ZONCLI_PAYLOAD = [
+    {
+        "group[]": "claen",
+        "where[cod_reg]": COMBS_REG_ZONCLI[i][0],
+        "where[zoncli]": COMBS_REG_ZONCLI[i][1],
+        "nofilter": "false",
+    }
+    for i in range(len(COMBS_REG_ZONCLI))
+]
+
+COMBS_REG_PROV_ZONCLI_PAYLOAD = [
+    {
+        "group[]": "claen",
+        "where[cod_reg]": COMSB_REG_PROV_ZONCLI[i][0],
+        "where[cod_pro]": COMSB_REG_PROV_ZONCLI[i][1],
+        "where[zoncli]": COMSB_REG_PROV_ZONCLI[i][2],
+        "nofilter": "false",
+    }
+    for i in range(len(COMSB_REG_PROV_ZONCLI))
 ]
 
 COMBS_YEARS_ZONCLI_PAYLOAD = [
@@ -60,72 +147,133 @@ COMBS_SURFACE_ZONCLI_PAYLOAD = [
     for i in range(len(COMBS_SURFACE_ZONCLI))
 ]
 
-COMBS_REG_PAYLOAD = [
-    {
-        "group[]": "claen",
-        "where[cod_reg]": CODREG[i],
-        "nofilter": "false",
-    }
-    for i in range(len(CODREG))
-]
-
-COMBS_REG_ZONCLI_PAYLOAD = [
-    {
-        "group[]": "claen",
-        "where[cod_reg]": COMBS_REG_ZONCLI[i][0],
-        "where[zoncli]": COMBS_REG_ZONCLI[i][1],
-        "nofilter": "false",
-    }
-    for i in range(len(COMBS_REG_ZONCLI))
-]
-
-COMBS_REG_PROV_PAYLOAD = [
-    {
-        "group[]": "claen",
-        "where[cod_reg]": COMBS_REG_PROV[i][0],
-        "where[cod_pro]": COMBS_REG_PROV[i][1],
-        "nofilter": "false",
-    }
-    for i in range(len(COMBS_REG_PROV))
-]
-
-COMBS_REG_PROV_ZONCLI_PAYLOAD = [
-    {
-        "group[]": "claen",
-        "where[cod_reg]": COMSB_REG_PROV_ZONCLI[i][0],
-        "where[cod_pro]": COMSB_REG_PROV_ZONCLI[i][1],
-        "where[zoncli]": COMSB_REG_PROV_ZONCLI[i][2],
-        "nofilter": "false",
-    }
-    for i in range(len(COMSB_REG_PROV_ZONCLI))
-]
-
-STANDARD_PAYLOAD = [
+COMBS_YEARS_SURFACE_ZONCLI_PAYLOAD = [
     {
         "group[]": "claen",
         "nofilter": "false",
+        "where[annoc][range][]": COMBS_YEARS_SURFACE_ZONCLI[i][0],
+        "where[suris][range][]": COMBS_YEARS_SURFACE_ZONCLI[i][1],
+        "where[zoncli]": COMBS_YEARS_SURFACE_ZONCLI[i][2],
     }
+    for i in range(len(COMBS_YEARS_SURFACE_ZONCLI))
 ]
 
-NATIONAL_ZONCLI_PAYLOAD = [
-    {
-        "group[]": "claen",
-        "where[zoncli]": ZONCLI[i],
-        "nofilter": "false",
-    }
-    for i in range(len(ZONCLI))
-]
-
-COMBS_DP412_93_RESID_NATIONAL_PAYLOAD = [
+COMBS_DP412_REG = [
     {
         "group[]": "claen",
         "where[destuso]": value,
         "where[dpr412]": key,
-        "where[zoncli]": ZONCLI[j],
-        "where[annoc][range][]": YEARS_LIMITS[z],
+        "where[cod_reg]": reg,
         "nofilter": "false",
     }
     for key, value in COMBS_DP412_93_RESID.items()
-    for j in range(len(ZONCLI))
-    for z in range(len(YEARS_LIMITS))
+    for reg in CODREG
 ]
+
+COMBS_DP412_REG_PROV = [
+    {
+        "group[]": "claen",
+        "where[destuso]": value,
+        "where[dpr412]": key,
+        "where[cod_reg]": reg,
+        "where[cod_pro]": prov,
+        "nofilter": "false",
+    }
+    for key, value in COMBS_DP412_93_RESID.items()
+    for reg in CODREG_TO_PROV.keys()
+    for prov in CODREG_TO_PROV[reg]
+]
+
+COMBS_DP412_ZONCLI = [
+    {
+        "group[]": "claen",
+        "where[destuso]": value,
+        "where[dpr412]": key,
+        "where[zoncli]": zoncli,
+        "nofilter": "false",
+    }
+    for key, value in COMBS_DP412_93_RESID.items()
+    for zoncli in ZONCLI
+]
+
+COMBS_DP412_YEARS = [
+    {
+        "group[]": "claen",
+        "where[destuso]": value,
+        "where[dpr412]": key,
+        "where[annoc][range][]": year,
+        "nofilter": "false",
+    }
+    for key, value in COMBS_DP412_93_RESID.items()
+    for year in YEARS_LIMITS
+]
+
+COMBS_DP412_SURFACE = [
+    {
+        "group[]": "claen",
+        "where[destuso]": value,
+        "where[dpr412]": key,
+        "where[suris][range][]": surface,
+        "nofilter": "false",
+    }
+    for key, value in COMBS_DP412_93_RESID.items()
+    for surface in SURFACE_LIMITS
+]
+
+COMBS_DP412_YEARS_SURFACE = [
+    {
+        "group[]": "claen",
+        "where[destuso]": value,
+        "where[dpr412]": key,
+        "where[annoc][range][]": year,
+        "where[suris][range][]": surface,
+        "nofilter": "false",
+    }
+    for key, value in COMBS_DP412_93_RESID.items()
+    for year in YEARS_LIMITS
+    for surface in SURFACE_LIMITS
+]
+
+# ADMISSIBLE COMBINATIONS
+ADMISSIBLE_COMBINATIONS = [
+    frozenset({"reg"}),                # Region only
+    frozenset({"prov"}),               # Province only
+    frozenset({"Y"}),                  # Years only
+    frozenset({"S"}),                  # Surface only
+    frozenset({"YS"}),                 # Years and Surface
+    frozenset({"ZC"}),                 # Zoncli only
+    frozenset({"DP412"}),              # DP412 only
+    frozenset({"reg", "ZC"}),          # Region and Zoncli
+    frozenset({"reg", "prov"}),        # Region and Province
+    frozenset({"reg", "prov", "ZC"}),  # Region, Province, and Zoncli
+    frozenset({"Y", "ZC"}),            # Years and Zoncli
+    frozenset({"S", "ZC"}),            # Surface and Zoncli
+    frozenset({"YS", "ZC"}),           # Years, Surface, and Zoncli
+    frozenset({"DP412", "reg"}),       # DP412 and Region
+    frozenset({"DP412", "prov"}),      # DP412 and Province
+    frozenset({"DP412", "ZC"}),        # DP412 and Zoncli
+    frozenset({"DP412", "Y"}),         # DP412 and Years
+    frozenset({"DP412", "S"}),         # DP412 and Surface
+    frozenset({"DP412", "YS"}),        # DP412 and Years and Surface
+]
+
+PAYLOAD_COMBS = {
+    frozenset({"reg"}): COMBS_REG_PAYLOAD,
+    frozenset({"prov"}): COMBS_REG_PROV_PAYLOAD,
+    frozenset({"Y"}): COMBS_YEARS_PAYLOAD,
+    frozenset({"S"}): COMBS_SURFACE_PAYLOAD,
+    frozenset({"ZC"}): NATIONAL_ZONCLI_PAYLOAD,
+    frozenset({"YS"}): COMBS_YEARS_SURFACE_PAYLOAD,
+    frozenset({"DP412"}): COMBS_DP412_93,
+    frozenset({"reg", "ZC"}): COMBS_REG_ZONCLI_PAYLOAD,
+    frozenset({"prov", "ZC"}): COMBS_REG_PROV_ZONCLI_PAYLOAD,
+    frozenset({"Y", "ZC"}): COMBS_YEARS_ZONCLI_PAYLOAD,
+    frozenset({"S", "ZC"}): COMBS_SURFACE_ZONCLI_PAYLOAD,
+    frozenset({"YS", "ZC"}): COMBS_YEARS_SURFACE_ZONCLI_PAYLOAD,
+    frozenset({"DP412", "reg"}): COMBS_DP412_REG,
+    frozenset({"DP412", "prov"}): COMBS_DP412_REG_PROV,
+    frozenset({"DP412", "ZC"}): COMBS_DP412_ZONCLI,
+    frozenset({"DP412", "Y"}): COMBS_DP412_YEARS,
+    frozenset({"DP412", "S"}): COMBS_DP412_SURFACE,
+    frozenset({"DP412", "YS"}): COMBS_DP412_YEARS_SURFACE,
+}

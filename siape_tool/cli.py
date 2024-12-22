@@ -2,23 +2,12 @@ import argparse
 from itertools import product
 from datetime import datetime
 import sys
+
+from siape_tool.utils.errors import NotAdmissibleCombination
 sys.path.append("/home/nauel/VSCode/SIAPE")
 
 from siape_tool.scraper import ScraperSIAPE
-from siape_tool.utils.api_calls_dicts import (
-    COMBS_YEARS_SURFACE_PAYLOAD,
-    COMBS_YEARS_SURFACE_ZONCLI_PAYLOAD,
-    COMBS_YEARS_ZONCLI_PAYLOAD,
-    COMBS_SURFACE_ZONCLI_PAYLOAD,
-    COMBS_REG_PAYLOAD,
-    COMBS_REG_ZONCLI_PAYLOAD,
-    COMBS_REG_PROV_PAYLOAD,
-    COMBS_REG_PROV_ZONCLI_PAYLOAD,
-    NATIONAL_ZONCLI_PAYLOAD,
-    COMBS_DP412_93_RESID_NATIONAL_PAYLOAD,
-    STANDARD_PAYLOAD,
-)
-
+from siape_tool.utils.api_calls_dicts import *
 
 class SIAPEToolCLI:
     def __init__(self):
@@ -30,32 +19,44 @@ class SIAPEToolCLI:
         download_parser.add_argument(
             "-g",
             "--geolocation",
-            help="Filter by geolocation, options: 'reg', 'prov'",
+            help="Filter by geolocation",
             choices=["reg", "prov"],
         )
-        # download_parser.add_argument(
-        #     "-r", 
-        #     "--resid", 
-        #     help="Filter by Residential and Non-Residential buildings, options: 'R', 'NR'",
-        #     choices=["R", "NR"],
-        # )
-        download_parser.add_argument(
-            "-z", 
-            "--zon_cli_filter", 
-            help="Filter by ZonCli, value: 'ZC'",
-            choices=["ZC"],
-        )
-        # download_parser.add_argument(
-        #     "-n", 
-        #     "--nzeb", 
-        #     help="Filter by NZEB, options: 'y', 'n'",
-        #     choices=["y", "n"],
-        # )
         download_parser.add_argument(
             "-q",
             "--qualitative_features",
-            help="Filter by qualitative features like Year of Construction and Surface, options: 'Y', 'S', 'YS'",
+            help="Filter by qualitative features like Year of Construction and Surface",
             choices=["Y", "S", "YS"],
+        )
+        download_parser.add_argument(
+            "-r", 
+            "--resid", 
+            help="Filter by Residential and Non-Residential buildings",
+            choices=["R", "NR"],
+        )
+        download_parser.add_argument(
+            "-z", 
+            "--zon_cli_filter", 
+            help="Filter by Climatic Zone",
+            action="store_const",
+            const="ZC",
+            default=None,
+        )
+        download_parser.add_argument(
+            "-d", 
+            "--dp412", 
+            help="Filter by type of building (based on law DP412/93",
+            action="store_const",
+            const="DP412",
+            default=None,
+        )
+        download_parser.add_argument(
+            "-n", 
+            "--nzeb", 
+            help="Filter by selecting only NZEB buildings",
+            action="store_const",
+            const="NZEB",
+            default=None,
         )
         download_parser.add_argument(
             "-o",
@@ -63,57 +64,24 @@ class SIAPEToolCLI:
             help="Output path for the data",
             default=f"data_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv",
         )
-        
-        # Map command arguments
-        self.args = self.parser.parse_args()
-        self.admissible_combinations = {
-            
-            # Admissible combinations
-            ("reg",): True,
-            ("prov",): True,
-            ("reg", "prov"): False,
-            ("Y",): True,
-            ("S",): True,
-            ("YS",): True,
-            ("reg", "ZC"): True,
-            ("prov", "ZC"): True,
-            ("Y", "ZC"): True,
-            ("S", "ZC"): True,
-            ("YS", "ZC"): True,
-            
-            # Not admissible combinations
-            ("reg", "Y"): False,
-            ("reg", "S"): False,
-            ("reg", "YS"): False,
-            ("prov", "Y"): False,
-            ("prov", "S"): False,
-            ("prov", "YS"): False,
-            
-        }
-        self.payload_list = {
-            ("reg",): COMBS_REG_PAYLOAD,
-            ("prov",): COMBS_REG_PROV_PAYLOAD,
-            ("Y",): COMBS_YEARS_SURFACE_PAYLOAD,
-            ("S",): COMBS_SURFACE_ZONCLI_PAYLOAD,
-            ("YS",): COMBS_YEARS_SURFACE_ZONCLI_PAYLOAD,
-            ("reg", "ZC"): COMBS_REG_ZONCLI_PAYLOAD,
-            ("prov", "ZC"): COMBS_REG_PROV_ZONCLI_PAYLOAD,
-            ("Y", "ZC"): COMBS_YEARS_ZONCLI_PAYLOAD,
-            ("S", "ZC"): COMBS_SURFACE_ZONCLI_PAYLOAD,
-            ("YS", "ZC"): COMBS_YEARS_SURFACE_ZONCLI_PAYLOAD           
-        }
+        self.args = self.parser.parse_args() #TODO: this works but generates an error after saving the data
+        self.admissible_combinations = ADMISSIBLE_COMBINATIONS
+        self.payload_combs = PAYLOAD_COMBS
         
 
     def run(self):
+        
         if self.args.command == "download":
             self.download()
-
+        else:
+            raise ValueError(f"Command {self.args.command} not recognized.")
+        
     def download(self):
-        scraper = ScraperSIAPE()
         self._check_admissible_combinations()
         self.payload = self._extract_payload()
+        scraper = ScraperSIAPE(self.args.resid, self.args.nzeb)
         data = scraper.get_data(self.payload)
-        print(data)
+        self._save_data(data)
         
     def _check_admissible_combinations(self):
         """
@@ -121,13 +89,22 @@ class SIAPEToolCLI:
         """
         args_tuple = tuple(
             value
-            for value in [self.args.geolocation, self.args.qualitative_features, self.args.zon_cli_filter]
+            for value in [
+                self.args.dp412,
+                self.args.geolocation, 
+                self.args.qualitative_features, 
+                self.args.zon_cli_filter,
+                ]
             if value is not None
         )
-        if len(args_tuple) == 0: # Standard payload case
-            pass
-        elif args_tuple not in self.admissible_combinations:
-            raise ValueError(f"The combination of arguments {args_tuple} is not admissible.")
+        args_set = frozenset(args_tuple)
+
+        if len(args_set) == 0:
+            pass  # Standard payload case
+        elif args_set not in ADMISSIBLE_COMBINATIONS:
+            raise NotAdmissibleCombination(
+                f"Combination of arguments {args_set} is not admissible."
+            )
         
         
     def _extract_payload(self):
@@ -138,16 +115,22 @@ class SIAPEToolCLI:
         """
         args_tuple = tuple(
             value
-            for value in [self.args.geolocation, self.args.qualitative_features, self.args.zon_cli_filter]
+            for value in [
+                self.args.dp412,
+                self.args.geolocation, 
+                self.args.qualitative_features, 
+                self.args.zon_cli_filter,
+                ]
             if value is not None
         )
-
-        if args_tuple in self.payload_list:
-            return self.payload_list[args_tuple]
-        else:
-            return STANDARD_PAYLOAD
+        args_set = frozenset(args_tuple)
         
-
-if __name__ == "__main__":
-    cli = SIAPEToolCLI()
-    cli.run()
+        if len(args_tuple) == 0:
+            return STANDARD_PAYLOAD
+        else:
+            return self.payload_combs[args_set]
+        
+    def _save_data(self, data):
+        data.to_csv(self.args.output, index=False)
+        print(f"Data saved to {self.args.output}")
+        

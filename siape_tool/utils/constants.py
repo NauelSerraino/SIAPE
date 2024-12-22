@@ -13,9 +13,14 @@ CODREG = [f"{i:02d}" for i in range(1, 23)]
 CODPRO = [f"{i:03d}" for i in range(1, 111)]
 COMBS_PRO_REG = [(i, j) for i in CODREG for j in CODPRO]
 
-RESID_MAP = {
+RESID_MAP_OUT = {
     "0": "Resid",
     "1": "Non Resid"
+}
+
+RESID_MAP_IN = {
+    "R": "0",
+    "NR": "1"
 }
 
 YEARS_LIMITS = [
