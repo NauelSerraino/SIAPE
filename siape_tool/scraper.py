@@ -1,11 +1,13 @@
 import time
 import pandas as pd
 import requests
+import warnings
 
 from tqdm import tqdm
 
 from siape_tool.utils.constants import *
 from tenacity import retry, wait_exponential, stop_after_attempt
+warnings.filterwarnings("ignore")
 
 
 class ScraperSIAPE:
@@ -25,7 +27,7 @@ class ScraperSIAPE:
         self._get_responses()
         self._convert_to_df()
 
-        return self.dfs.apply(pd.to_numeric, errors='coerce')
+        return self.dfs.apply(pd.to_numeric, errors='ignore')
 
     def _prepare_payload(self, payload):
         if self.resid is not None:
