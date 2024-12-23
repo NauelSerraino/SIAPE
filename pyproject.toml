@@ -1,27 +1,25 @@
 [tool.poetry]
-name = "siape_tool"
+name = "siape-cli"
 version = "0.1.0"
 description = "CLI tool to download aggregated data from SIAPE website."
 authors = ["Nauel Serraino"]
 readme = "README.md"
 keywords = ["siape", "scraper", "energy", "epc", "italy"]
+packages = [{ include = "siape_tool" }]
 
 [tool.poetry.scripts]
-siape-cli = "siape_tool.__main__:main" 
+siape-cli = "siape_tool.main:main"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-fire = "^0.7.0"
 pandas = "^2.2.3"
 numpy = "^2.2.0"
 argparse = "^1.4.0"
 tenacity = "^9.0.0"
 requests = "^2.32.3"
 tqdm = "^4.67.1"
-unittest = "^0.0"
 tabulate = "^0.9.0"
 
-[tool.poetry.dev-dependencies]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -25,7 +25,7 @@ class ScraperSIAPE:
         self._get_responses()
         self._convert_to_df()
 
-        return self.dfs.apply(pd.to_numeric, errors="ignore")
+        return self.dfs.apply(pd.to_numeric, errors='coerce')
 
     def _prepare_payload(self, payload):
         if self.resid is not None:
@@ -52,7 +52,7 @@ class ScraperSIAPE:
                 self.payloads = payload_list.copy()
             else:                                   # [NO FILTER]
                 self.payloads = payload.copy()
-
+        
     def _get_responses(self):
         """
         Get the responses from the API
