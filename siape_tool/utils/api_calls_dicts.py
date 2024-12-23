@@ -240,7 +240,7 @@ ADMISSIBLE_COMBINATIONS = [
     frozenset({"prov"}),               # Province only
     frozenset({"y"}),                  # Years only
     frozenset({"s"}),                  # Surface only
-    frozenset({"YS"}),                 # Years and Surface
+    frozenset({"ys"}),                 # Years and Surface
     frozenset({"ZC"}),                 # Zoncli only
     frozenset({"DP412"}),              # DP412 only
     frozenset({"reg", "ZC"}),          # Region and Zoncli
@@ -248,13 +248,13 @@ ADMISSIBLE_COMBINATIONS = [
     frozenset({"reg", "prov", "ZC"}),  # Region, Province, and Zoncli
     frozenset({"y", "ZC"}),            # Years and Zoncli
     frozenset({"s", "ZC"}),            # Surface and Zoncli
-    frozenset({"YS", "ZC"}),           # Years, Surface, and Zoncli
+    frozenset({"ys", "ZC"}),           # Years, Surface, and Zoncli
     frozenset({"DP412", "reg"}),       # DP412 and Region
     frozenset({"DP412", "prov"}),      # DP412 and Province
     frozenset({"DP412", "ZC"}),        # DP412 and Zoncli
     frozenset({"DP412", "y"}),         # DP412 and Years
     frozenset({"DP412", "s"}),         # DP412 and Surface
-    frozenset({"DP412", "YS"}),        # DP412 and Years and Surface
+    frozenset({"DP412", "ys"}),        # DP412 and Years and Surface
 ]
 
 PAYLOAD_COMBS = {
@@ -263,17 +263,17 @@ PAYLOAD_COMBS = {
     frozenset({"y"}): COMBS_YEARS_PAYLOAD,
     frozenset({"s"}): COMBS_SURFACE_PAYLOAD,
     frozenset({"ZC"}): NATIONAL_ZONCLI_PAYLOAD,
-    frozenset({"YS"}): COMBS_YEARS_SURFACE_PAYLOAD,
+    frozenset({"ys"}): COMBS_YEARS_SURFACE_PAYLOAD,
     frozenset({"DP412"}): COMBS_DP412_93,
     frozenset({"reg", "ZC"}): COMBS_REG_ZONCLI_PAYLOAD,
     frozenset({"prov", "ZC"}): COMBS_REG_PROV_ZONCLI_PAYLOAD,
     frozenset({"y", "ZC"}): COMBS_YEARS_ZONCLI_PAYLOAD,
     frozenset({"s", "ZC"}): COMBS_SURFACE_ZONCLI_PAYLOAD,
-    frozenset({"YS", "ZC"}): COMBS_YEARS_SURFACE_ZONCLI_PAYLOAD,
+    frozenset({"ys", "ZC"}): COMBS_YEARS_SURFACE_ZONCLI_PAYLOAD,
     frozenset({"DP412", "reg"}): COMBS_DP412_REG,
     frozenset({"DP412", "prov"}): COMBS_DP412_REG_PROV,
     frozenset({"DP412", "ZC"}): COMBS_DP412_ZONCLI,
     frozenset({"DP412", "y"}): COMBS_DP412_YEARS,
     frozenset({"DP412", "s"}): COMBS_DP412_SURFACE,
-    frozenset({"DP412", "YS"}): COMBS_DP412_YEARS_SURFACE,
+    frozenset({"DP412", "ys"}): COMBS_DP412_YEARS_SURFACE,
 }
