@@ -106,10 +106,11 @@ NotAdmissibleCombination: Combination of arguments <args_set> is not admissible.
 
 Contributions are welcome! So far only the main filtering arguments have been implemented, and more features can be added to enhance the tool. Follow these steps to get started:
 
-1. Fork the repository.
-2. Create a new branch for your feature/fix.
-3. Commit your changes and push the branch.
-4. Open a pull request for review.
+1. Open an issue to discuss the feature/fix.
+2. Fork the repository.
+3. Create a new branch for your feature/fix.
+4. Commit your changes and push the branch.
+5. Open a pull request for review.
 
 ---
 
