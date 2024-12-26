@@ -39,7 +39,7 @@ class SIAPEToolCLI:
             "--zon_cli_filter", 
             help="Filter by Climatic Zone", 
             action="store_const", 
-            const="ZC", 
+            const="zc", 
             default=None
         )
         download_parser.add_argument(
@@ -47,7 +47,7 @@ class SIAPEToolCLI:
             "--dp412", 
             help="Filter by type of building (based on law DP412/93", 
             action="store_const", 
-            const="DP412", 
+            const="dp412", 
             default=None
         )
         download_parser.add_argument(
@@ -55,14 +55,14 @@ class SIAPEToolCLI:
             "--nzeb", 
             help="Filter by selecting only NZEB buildings", 
             action="store_const", 
-            const="NZEB", 
+            const="nzeb", 
             default=None
         )
         download_parser.add_argument(
             "-o", 
             "--output", 
             help="Output path for the data", 
-            default=f"data_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv"
+            default=f"{datetime.now().strftime('%Y%m%d%H%M%S')}.csv"
         )
         self.args = self.parser.parse_args()
         self.admissible_combinations = ADMISSIBLE_COMBINATIONS
@@ -76,6 +76,7 @@ class SIAPEToolCLI:
         self.payload = self._extract_payload()
         scraper = ScraperSIAPE(self.args.resid, self.args.nzeb)
         data = scraper.get_data(self.payload)
+        self._update_output_name()
         self._save_data(data)
         
     def _check_admissible_combinations(self):
@@ -116,6 +117,30 @@ class SIAPEToolCLI:
         else:
             return self.payload_combs[args_set]
         
+    def _update_output_name(self):
+        """
+        Build a new output name based on the combination of arguments
+        """
+        args_tuple = tuple(
+            value
+            for value in [
+                self.args.dp412,
+                self.args.geolocation, 
+                self.args.qualitative_features, 
+                self.args.zon_cli_filter,
+                ]
+            if value is not None
+        )
+        args_set = frozenset(args_tuple)
+        
+        if len(args_set) == 0:
+            return
+        
+        new_output = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_"
+        new_output += "_".join(args_set)
+        new_output += ".csv"
+        self.args.output = new_output
+    
     def _save_data(self, data):
         data.to_csv(self.args.output, index=False, sep="|")
         print(f"Data saved to {self.args.output}")

@@ -19,8 +19,8 @@ RESID_MAP_OUT = {
 }
 
 RESID_MAP_IN = {
-    "R": "0",
-    "NR": "1"
+    "res": "0",
+    "non-res": "1"
 }
 
 YEARS_LIMITS = [
