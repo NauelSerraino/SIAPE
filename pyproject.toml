@@ -1,11 +1,12 @@
 [tool.poetry]
 name = "siape-cli"
-version = "0.2.0"
+version = "0.2.1"
 description = "CLI tool to download aggregated data from SIAPE website."
 authors = ["Nauel Serraino"]
 readme = "README.md"
 keywords = ["siape", "scraper", "energy", "epc", "italy"]
 packages = [{ include = "siape_tool" }]
+repository = "https://github.com/NauelSerraino/SIAPE"
 
 [tool.poetry.scripts]
 siape-cli = "siape_tool.main:main"

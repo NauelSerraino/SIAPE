@@ -1,8 +1,5 @@
 import unittest
-import sys
 from unittest import mock
-
-sys.path.append("/home/nauel/VSCode/SIAPE")
 
 from siape_tool.utils.errors import NotAdmissibleCombination
 

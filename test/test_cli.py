@@ -2,8 +2,6 @@ import unittest
 import sys
 from unittest import mock
 
-# sys.path.append("/home/nauel/VSCode/SIAPE")
-
 from unittest.mock import patch
 from siape_tool.cli import SIAPEToolCLI
 
