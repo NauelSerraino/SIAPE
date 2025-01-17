@@ -138,25 +138,28 @@ class SIAPEToolCLI:
         """
         Build a new output name based on the combination of arguments
         """
-        args_tuple = tuple(
-            value
-            for value in [
-                self.args.dp412,
-                self.args.geolocation, 
-                self.args.qualitative_features, 
-                self.args.zon_cli_filter,
-                ]
-            if value is not None
-        )
-        args_set = frozenset(args_tuple)
-        
-        if len(args_set) == 0:
-            return
-        
-        new_output = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_"
-        new_output += "_".join(args_set)
-        new_output += ".csv"
-        self.args.output = new_output
+        if self.args.output is not None:
+            pass
+        else:
+            args_tuple = tuple(
+                value
+                for value in [
+                    self.args.dp412,
+                    self.args.geolocation, 
+                    self.args.qualitative_features, 
+                    self.args.zon_cli_filter,
+                    ]
+                if value is not None
+            )
+            args_set = frozenset(args_tuple)
+            
+            if len(args_set) == 0:
+                return
+            
+            new_output = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_"
+            new_output += "_".join(args_set)
+            new_output += ".csv"
+            self.args.output = new_output
     
     def _save_data(self, data):
         data.to_csv(self.args.output, index=False, sep="|")
