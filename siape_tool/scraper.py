@@ -7,15 +7,24 @@ from tqdm import tqdm
 
 from siape_tool.utils.constants import *
 from tenacity import retry, wait_exponential, stop_after_attempt
+
+from siape_tool.utils.errors import NotAdmissibleYearRange
 warnings.filterwarnings("ignore")
 
 
 class ScraperSIAPE:
-    def __init__(self, resid=None, nzeb=None):
+    def __init__(
+        self, 
+        resid=None, 
+        nzeb=None,
+        year_emission_lower=None,
+        year_emission_upper=None
+        ):
         self.url = URL
         self.headers = HEADERS
         self.resid = RESID_MAP_IN[resid] if resid is not None else None
         self.nzeb = nzeb
+        self.year_epc = self._create_year_epc(year_emission_lower, year_emission_upper)
 
     def get_data(self, payload):
         """
@@ -30,30 +39,18 @@ class ScraperSIAPE:
         return self.dfs.apply(pd.to_numeric, errors='ignore')
 
     def _prepare_payload(self, payload):
+        filters = {}
         if self.resid is not None:
-            if self.nzeb is not None:               # [RESID + NZEB]
-                payload_list = [{
-                    **single_payload,
-                    "where[destuso]": self.resid,
-                    "where[nzeb]": "true"
-                } for single_payload in payload]
-                self.payloads = payload_list.copy()
-            else:                                   # [RESID]
-                payload_list = [{
-                    **single_payload,
-                    "where[destuso]": self.resid
-                } for single_payload in payload]
-                self.payloads = payload_list.copy()
+            filters["where[destuso]"] = self.resid
+        if self.nzeb is not None:
+            filters["where[nzeb]"] = "true"
+        if self.year_epc is not None:
+            self._check_years_within_range(self.year_epc)
+            filters["where[annoape][range][]"] = self.year_epc
 
-        else:
-            if self.nzeb is not None:               # [NZEB]
-                payload_list = [{
-                    **single_payload,
-                    "where[nzeb]": "true"
-                } for single_payload in payload]
-                self.payloads = payload_list.copy()
-            else:                                   # [NO FILTER]
-                self.payloads = payload.copy()
+        self.payloads = [
+            {**single_payload, **filters} for single_payload in payload
+        ]
         
     def _get_responses(self):
         """
@@ -107,6 +104,33 @@ class ScraperSIAPE:
 
         self.dfs = pd.concat(dfs, ignore_index=True)
         self.dfs = self._final_cleaning(self.dfs)
+    
+    def _create_year_epc(self, year_emission_lower, year_emission_upper):
+        if year_emission_lower is not None and year_emission_upper is not None:
+            return [year_emission_lower, year_emission_upper]
+        elif year_emission_lower is not None and year_emission_upper is None:
+            return [year_emission_lower, 1000000000]
+        elif year_emission_lower is None and year_emission_upper is not None:
+            return [-1000000000, year_emission_upper]
+        else:
+            return None
+        
+    def _check_years_within_range(self, year_epc):
+        if year_epc[0] > year_epc[1]:
+            raise NotAdmissibleYearRange(
+                f"Year filter {year_epc[0]} is greater than year filter {year_epc[1]}"
+            )
+        
+        if year_epc[0] == year_epc[1]:
+            raise NotAdmissibleYearRange(
+                f"Year filter {year_epc[0]} is equal to year filter {year_epc[1]}"
+            )
+        
+        if (year_epc[0] != -1_000_000_000 and year_epc[0] < 2015) or (year_epc[1] < 2015):
+            raise NotAdmissibleYearRange(
+                f"Year filter {year_epc[0]} or {year_epc[1]} is less than 2015"
+            )
+
 
     @staticmethod
     def apply_cla_eng_order(df):
@@ -157,7 +181,8 @@ class ScraperSIAPE:
             "where[zoncli]": "ZON_CLI",
             "where[destuso]": "RESID",
             "where[cod_reg]": "REG",
-            "where[cod_pro]": "PROV"
+            "where[cod_pro]": "PROV",
+            "where[annoape][range][]": "YEAR_EPC",
         })
 
         if "RESID" in dfs.columns:

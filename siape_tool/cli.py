@@ -43,6 +43,18 @@ class SIAPEToolCLI:
             default=None
         )
         download_parser.add_argument(
+            "-yl",
+            "--year_emission_lower",
+            help="Filter by year of emission of the EPC - Lower bound (Year >= 2015)",
+            type=int
+        )
+        download_parser.add_argument(
+            "-yu",
+            "--year_emission_upper",
+            help="Filter by year of emission of the EPC - Upper bound (Year >= 2015)",
+            type=int
+        )
+        download_parser.add_argument(
             "-d", 
             "--dp412", 
             help="Filter by type of building (based on law DP412/93", 
@@ -74,7 +86,12 @@ class SIAPEToolCLI:
     def download(self):
         self._check_admissible_combinations()
         self.payload = self._extract_payload()
-        scraper = ScraperSIAPE(self.args.resid, self.args.nzeb)
+        scraper = ScraperSIAPE(
+            self.args.resid, 
+            self.args.nzeb,
+            self.args.year_emission_lower,
+            self.args.year_emission_upper
+            )
         data = scraper.get_data(self.payload)
         self._update_output_name()
         self._save_data(data)
