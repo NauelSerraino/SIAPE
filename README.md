@@ -40,6 +40,8 @@ siape-cli download [OPTIONS]
 | `-q`, `--qualitative_features` | Filter by qualitative features (years, surface, or both). | `y`, `s`, `ys`        |
 | `-r`, `--resid`          | Filter by building type (Residential/Non-Residential).| `res`, `non-res`     |
 | `-z`, `--zon_cli_filter` | Filter by climatic zones.                             | -                    |
+| `-yl`, `--year_emission_lower`  | Lower bound for EPC year of emission (Year >= 2015).   | Integer (>= 2015)                    |
+| `-yu`, `--year_emission_upper`  | Upper bound for EPC year of emission (Year >= 2015).   | Integer (>= 2015)                    |
 | `-d`, `--dp412`          | Filter by law DP412/93.                               | -                    |
 | `-n`, `--nzeb`           | Filter by NZEB buildings only.                        | -                    |
 | `-o`, `--output`         | Specify output file name (default: `<timestamp>.csv`).| -                    |
