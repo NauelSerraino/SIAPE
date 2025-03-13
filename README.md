@@ -4,7 +4,7 @@ SIAPE-cli is a Python package designed to facilitate interaction with the [SIAPE
 
 ---
 
-## 🌟 Features
+## Features
 
 - Filter building-related data using geolocation, qualitative features, climatic zones, and other criteria.
 - Enforce admissible combinations for filter options.
@@ -12,7 +12,7 @@ SIAPE-cli is a Python package designed to facilitate interaction with the [SIAPE
 
 ---
 
-## 🚀 Installation
+## Installation
 
 ### From PyPI
 
@@ -24,7 +24,7 @@ After installation, the package provides a `download` command to filter and expo
 
 ---
 
-### 🛠️ Command-Line Interface (CLI)
+### Command-Line Interface (CLI)
 
 You can invoke the CLI using the `siape-cli` command:
 
@@ -46,7 +46,7 @@ siape-cli download [OPTIONS]
 
 ---
 
-## 🖋️ Examples
+## Examples
 
 1. **Download data for residential buildings in regions**:
    ```bash
@@ -70,7 +70,7 @@ siape-cli download [OPTIONS]
 
 ---
 
-## 🚫 Rules and Restrictions
+## Rules and Restrictions
 
 To maintain data integrity, the tool enforces the following admissible combinations:
 
@@ -102,7 +102,7 @@ NotAdmissibleCombination: Combination of arguments <args_set> is not admissible.
 
 ---
  
-## 🧑‍💻 Contribution
+## Contribution
 
 Contributions are welcome! So far only the main filtering arguments have been implemented, and more features can be added to enhance the tool. Follow these steps to get started:
 
@@ -112,8 +112,31 @@ Contributions are welcome! So far only the main filtering arguments have been im
 4. Commit your changes and push the branch.
 5. Open a pull request for review.
 
+<details>
+  <summary>Notes for developers</summary>
+  This project uses [Poetry](https://python-poetry.org/) for dependency management. To install the required dependencies, run:
+  
+  ```bash
+   git clone https://github.com/NauelSerraino/SIAPE.git
+   cd SIAPE
+   poetry install
+   poetry shell # Activate the virtual environment
+   ```
+
+   To test the package, run:
+   ```bash
+   siape-cli download
+   ```
+   __Note__: The command will reflect the latest changes made to the package.
+
+   To run the tests, use:
+   ```bash
+   python test/test_cli_mock.py
+   python test/test_cli.py
+   ```
+
 ---
 
-## 📜 License
+## License
 
 This project is licensed under the [MIT License](LICENSE).

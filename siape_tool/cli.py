@@ -43,6 +43,18 @@ class SIAPEToolCLI:
             default=None
         )
         download_parser.add_argument(
+            "-yl",
+            "--year_emission_lower",
+            help="Filter by year of emission of the EPC - Lower bound (Year >= 2015)",
+            type=int
+        )
+        download_parser.add_argument(
+            "-yu",
+            "--year_emission_upper",
+            help="Filter by year of emission of the EPC - Upper bound (Year >= 2015)",
+            type=int
+        )
+        download_parser.add_argument(
             "-d", 
             "--dp412", 
             help="Filter by type of building (based on law DP412/93", 
@@ -74,7 +86,12 @@ class SIAPEToolCLI:
     def download(self):
         self._check_admissible_combinations()
         self.payload = self._extract_payload()
-        scraper = ScraperSIAPE(self.args.resid, self.args.nzeb)
+        scraper = ScraperSIAPE(
+            self.args.resid, 
+            self.args.nzeb,
+            self.args.year_emission_lower,
+            self.args.year_emission_upper
+            )
         data = scraper.get_data(self.payload)
         self._update_output_name()
         self._save_data(data)
@@ -121,25 +138,28 @@ class SIAPEToolCLI:
         """
         Build a new output name based on the combination of arguments
         """
-        args_tuple = tuple(
-            value
-            for value in [
-                self.args.dp412,
-                self.args.geolocation, 
-                self.args.qualitative_features, 
-                self.args.zon_cli_filter,
-                ]
-            if value is not None
-        )
-        args_set = frozenset(args_tuple)
-        
-        if len(args_set) == 0:
-            return
-        
-        new_output = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_"
-        new_output += "_".join(args_set)
-        new_output += ".csv"
-        self.args.output = new_output
+        if self.args.output is not None:
+            pass
+        else:
+            args_tuple = tuple(
+                value
+                for value in [
+                    self.args.dp412,
+                    self.args.geolocation, 
+                    self.args.qualitative_features, 
+                    self.args.zon_cli_filter,
+                    ]
+                if value is not None
+            )
+            args_set = frozenset(args_tuple)
+            
+            if len(args_set) == 0:
+                return
+            
+            new_output = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_"
+            new_output += "_".join(args_set)
+            new_output += ".csv"
+            self.args.output = new_output
     
     def _save_data(self, data):
         data.to_csv(self.args.output, index=False, sep="|")

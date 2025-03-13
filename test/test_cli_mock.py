@@ -67,6 +67,30 @@ class TestSIAPEToolCLIDownloadCorrect(unittest.TestCase):
         
         mock_scraper_instance.get_data.assert_called_once()
         mock_save_data.assert_called_once_with("mocked_data")
+        
+    @patch("siape_tool.cli.ScraperSIAPE")
+    @patch("siape_tool.cli.SIAPEToolCLI._save_data")
+    @patch("sys.argv", [
+        "cli.py", "download", 
+        "--geolocation", "reg", 
+        "--year_emission_lower", "2015",
+        "--year_emission_upper", "2020"])
+    def test_download_with_years(self, mock_save_data, mock_scraper):
+        """
+        Check that the program correctly parses the years.
+        """
+        mock_scraper_instance = mock_scraper.return_value
+        mock_scraper_instance.get_data.return_value = "mocked_data"
+        
+        main()
+        
+        cli = SIAPEToolCLI()
+        self.assertEqual(cli.args.geolocation, "reg")
+        self.assertEqual(cli.args.year_emission_lower, "2015")
+        self.assertEqual(cli.args.year_emission_upper, "2020")
+        
+        mock_scraper_instance.get_data.assert_called_once()
+        mock_save_data.assert_called_once_with("mocked_data")
                 
 
 class TestSIAPEToolCLIErrors(unittest.TestCase):
